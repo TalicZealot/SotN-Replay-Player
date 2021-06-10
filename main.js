@@ -1,9 +1,12 @@
 const width = 904;
 const height = 1414;
 const defaultPlaybackSpeed = 0.04;
+const validExtension = "sotnr";
 
 var scrollContainer = document.getElementById('scroll-container');
-var replayFile = $('#replay-file');
+var replayFileA = $('#replay-file-A');
+var replayFileB = $('#replay-file-B');
+var uploadBox = $('#upload-box');
 
 var playButton = $('#play-button');
 var rewindButton = $("#rewind-button");
@@ -16,52 +19,62 @@ var speedSelectNormal = $('#speed-select-normal');
 var speedSelectDouble = $('#speed-select-double');
 var speedSelectTripple = $('#speed-select-tripple');
 
-var playText = '▶';
-var pauseText = '⏸';
-
 var stage = new Konva.Stage({
     container: 'main-map',
     width: width,
     height: height
 });
 
-var alucard = new Konva.Circle({
-    x: 8,
-    y: 1240,
-    radius: 5,
-    fill: 'red',
-    stroke: 'black',
-    strokeWidth: 2
-});
+var playerA = {
+    indicator: new Konva.Circle({
+        x: 8,
+        y: 1240,
+        radius: 5,
+        fill: '#e79544',
+        stroke: 'black',
+        strokeWidth: 2
+    }),
+    trail: new Konva.Path({
+        x: 0,
+        y: 0,
+        stroke: '#e79544',
+        strokeWidth: 4,
+        opacity: 1
+    }),
+    replay: null,
+    replaySvgData: []
+};
 
-var trail = new Konva.Path({
-    x: 0,
-    y: 0,
-    stroke: '#2d14ae',
-    strokeWidth: 4,
-    opacity: 0.5
-});
-
-var mapObject = new Image();
-mapObject.src = './images/map.png';
+var playerB = {
+    indicator: new Konva.Circle({
+        x: 8,
+        y: 1240,
+        radius: 5,
+        fill: '#27ba5b',
+        stroke: '#111111',
+        strokeWidth: 2
+    }),
+    trail: new Konva.Path({
+        x: 0,
+        y: 0,
+        stroke: '#27ba5b',
+        strokeWidth: 4,
+        opacity: 1
+    }),
+    replay: null,
+    replaySvgData: []
+};
 
 var background = new Konva.Layer();
+var relicsLayer = new Konva.Layer();
 var foreground = new Konva.Layer();
-foreground.add(trail);
-foreground.add(alucard);
-
-var path;
-var speedsPanelShown = false;
-var svgData = [];
-var pathLenght;
-var distance;
-var replay;
-var animation;
-var playbackSpeed = 1;
-var animationIndex = 0;
-var progress = 0;
-var oldIndex = 0;
-var castle = 1;
+foreground.add(playerB.trail);
+foreground.add(playerA.trail);
+foreground.add(playerB.indicator);
+foreground.add(playerA.indicator);
+stage.add(background);
+stage.add(relicsLayer);
+stage.add(foreground);
 
 var relics = {
     SoulOfBat: false,
@@ -89,7 +102,6 @@ var relics = {
     SwordCard: false,
     SpriteCard: false,
     NoseDevilCard: false,
-    //ThrustSword: false,
     HeartOfVlad: false,
     ToothOfVlad: false,
     RibOfVlad: false,
@@ -99,7 +111,32 @@ var relics = {
     SilverRing: false,
     SpikeBreaker: false,
     HolyGlasses: false
+        //ThrustSword: false,
 };
+
+var mapElement = new Image();
+mapElement.src = './images/map.png';
+mapElement.onload = function() {
+    var mapImage = new Konva.Image({
+        x: 0,
+        y: 0,
+        image: mapElement,
+        width: 904,
+        height: 1414
+    });
+
+    background.add(mapImage);
+    background.batchDraw();
+};
+
+mapRelics = new Array(relics.length);
+
+var speedsPanelShown = false;
+var animation;
+var playbackSpeed = 1;
+var animationIndex = 0;
+var oldIndex = 0;
+var castle = 1;
 
 function getManhattanDistance(pointA, pointB) {
     let xdifference = Math.abs(pointA.x - pointB.x);
@@ -112,28 +149,28 @@ function rewind() {
     animationIndex = 0;
     oldIndex = 0;
     castle = 1;
-    trail.data(svgData[0]);
+    playerA.trail.data(playerA.replaySvgData[0]);
     animation = null;
-    alucard.x(replay[0].x);
-    alucard.y(replay[0].y);
+    playerA.indicator.x(playerA.replay[0].x);
+    playerA.indicator.y(playerA.replay[0].y);
     foreground.batchDraw();
 }
 
 function seek() {
-    if (!replay) {
+    if (!playerA.replay) {
         return;
     }
     let progress = progressBar.val();
 
-    let index = Math.round(replay.length * (progress / 100));
+    let index = Math.round(playerA.replay.length * (progress / 100));
 
     animationIndex = index;
     oldIndex = index;
 
-    alucard.x(replay[index].x);
-    alucard.y(replay[index].y);
+    playerA.indicator.x(playerA.replay[index].x);
+    playerA.indicator.y(playerA.replay[index].y);
 
-    trail.data(svgData[index]);
+    playerA.trail.data(playerA.replaySvgData[index]);
 
     foreground.batchDraw();
 }
@@ -142,9 +179,15 @@ function getReplayData(replayRows) {
     var pathCoords = [];
     replayRows.forEach(step => {
         let values = step.split(":");
+        let thrust = 0;
+        let warp = false;
 
         if (!values[0] || values[0] > 100 || !values[1] || values[1] > 100) {
             return;
+        }
+
+        if (values[37]) {
+            thrust = values[37];
         }
 
         let secondCastle = values[2] > 0;
@@ -156,9 +199,14 @@ function getReplayData(replayRows) {
             y = (640 + (values[1] * 15));
         }
 
+        if (pathCoords.length > 0 && getManhattanDistance({ x: x, y: y }, pathCoords[pathCoords.length - 1]) > 30) {
+            warp = true;
+        }
+
         pathCoords.push({
             x: x,
             y: y,
+            warp: warp,
             secondCastle: secondCastle,
             relics: {
                 SoulOfBat: values[3],
@@ -194,42 +242,86 @@ function getReplayData(replayRows) {
                 GoldRing: values[33],
                 SilverRing: values[34],
                 SpikeBreaker: values[35],
-                HolyGlasses: values[36]
-                    //ThrustSword: values[37],
+                HolyGlasses: values[36],
+                ThrustSword: thrust
             }
         });
     });
     return pathCoords;
 }
 
-function getSvgData(replayData) {
-    let startNode = 'M' + replayData[0].x + ',' + replayData[0].y + ' ';
-    svgData.push(startNode);
+function getRelicLocations(replayData) {
+    let relicKeys = Object.getOwnPropertyNames(relics);
     for (let i = 1; i < replayData.length; i++) {
-        let node = '';
-        if (i < replayData.length - 1) {
+        for (let j = 0; j < relicKeys.length; j++) {
+            if (replayData[i].relics[relicKeys[j]] > 0 && replayData[i - 1].relics[relicKeys[j]] == 0) {
+                relicKeys.splice(j, 1);
+                if (!mapRelics[j]) {
+                    continue;
+                }
+                mapRelics[j].x(replayData[i].x);
+                mapRelics[j].y(replayData[i].y - 8);
+            }
+        }
+    }
+    relicsLayer.batchDraw();
+}
+
+function generateSvgPathData(replayData, pathData) {
+    let startNode = 'M' + replayData[0].x + ',' + replayData[0].y + ' ';
+    pathData.push(startNode);
+    for (let i = 1; i < replayData.length; i++) {
+        let node = pathData[i - 1];
+
+        if (i > 0 && replayData[i].warp) {
+            node += 'M';
+        } else {
             node += 'L';
         }
-        node += svgData[i - 1] + replayData[i].x + ',' + replayData[i].y + ' ';
-        svgData.push(node);
+
+        node += replayData[i].x + ',' + replayData[i].y + ' ';
+        pathData.push(node);
     }
-    return svgData;
 }
 
 function startPlayback() {
-    trail.data(svgData[0]);
+    playerA.trail.data(playerA.replaySvgData[0]);
 
-    alucard.x(replay[0].x);
-    alucard.y(replay[0].y);
+    playerA.indicator.x(playerA.replay[0].x);
+    playerA.indicator.y(playerA.replay[0].y);
 
     animation = new Konva.Animation(function(frame) {
-        animationIndex += playbackSpeed * defaultPlaybackSpeed;
         let index = Math.round(animationIndex);
-        if (index >= replay.length) {
-            index = replay.length - 1;
+        let indexA = index;
+        let indexB = index;
+
+        if (index >= playerA.replay.length) {
+            indexA = playerA.replay.length - 1;
         }
 
-        if (replay[index].secondCastle) {
+        if (playerB.replay && index >= playerB.replay.length) {
+            indexB = playerB.replay.length - 1;
+        }
+
+        let animationSpeed = playbackSpeed * defaultPlaybackSpeed;
+        if (playerA.replay[indexA].warp || (playerB.replay && playerB.replay[indexB].warp)) {
+            animationSpeed = defaultPlaybackSpeed / 5;
+        }
+
+        animationIndex += animationSpeed;
+        index = Math.round(animationIndex);
+        indexA = index;
+        indexB = index;
+
+        if (index >= playerA.replay.length) {
+            indexA = playerA.replay.length - 1;
+        }
+
+        if (playerB.replay && index >= playerB.replay.length) {
+            indexB = playerB.replay.length - 1;
+        }
+
+        if (playerA.replay[indexA].secondCastle) {
             if (castle == 1) {
                 castle = 2;
                 showSecondtCastle();
@@ -241,20 +333,30 @@ function startPlayback() {
             }
         }
 
-        approach(alucard, replay[index]);
+        approach(playerA.indicator, playerA.replay[indexA]);
 
-        if (index > oldIndex) {
-            trail.data(svgData[index]);
-            oldIndex = index;
-            progressBar.val(Math.round((index / replay.length) * 100));
+        if (playerB.replay) {
+            approach(playerB.indicator, playerB.replay[indexB]);
+            if (index > oldIndex) {
+                playerB.trail.data(playerB.replaySvgData[indexB - 1]);
+            }
         }
 
-        setRelics(index);
+        if (index > oldIndex) {
+            playerA.trail.data(playerA.replaySvgData[indexA - 1]);
+            oldIndex = index;
+            progressBar.val(Math.round((indexA / playerA.replay.length) * 100));
+        }
+
+        setRelics(indexA);
         displayRelics();
 
-        if (index == replay.length - 1) {
+        if ((playerB.replay && playerB.replay.length > playerA.replay.length && index == playerB.replay.length - 1) ||
+            (playerB.replay && playerA.replay.length > playerB.replay.length && index == playerA.replay.length - 1) ||
+            (!playerB.replay && (index == playerA.replay.length - 1))) {
             animation.stop();
-            playButton.text(playText);
+            playButton.removeClass('pause-icon');
+            playButton.addClass('play-icon');
         }
     }, foreground);
 
@@ -281,7 +383,7 @@ function approach(object, point) {
 function setRelics(index) {
     let relicKeys = Object.getOwnPropertyNames(relics);
     for (let i = 0; i < relicKeys.length; i++) {
-        relics[relicKeys[i]] = replay[index].relics[relicKeys[i]] > 0;
+        relics[relicKeys[i]] = playerA.replay[index].relics[relicKeys[i]] > 0;
     }
 }
 
@@ -298,9 +400,10 @@ function displayRelics() {
 }
 
 function pause() {
-    if (animation.isRunning()) {
+    if (animation && animation.isRunning()) {
         animation.stop();
-        playButton.text(playText);
+        playButton.removeClass('pause-icon');
+        playButton.addClass('play-icon');
     }
 }
 
@@ -310,11 +413,13 @@ function play() {
             pause();
         } else {
             animation.start();
-            playButton.text(pauseText);
+            playButton.removeClass('play-icon');
+            playButton.addClass('pause-icon');
         }
     } else {
         startPlayback();
-        playButton.text(pauseText);
+        playButton.removeClass('play-icon');
+        playButton.addClass('pause-icon');
     }
 }
 
@@ -342,32 +447,36 @@ function showSecondtCastle() {
     });
 }
 
-mapObject.onload = function() {
-    var mapImage = new Konva.Image({
-        x: 0,
-        y: 0,
-        image: mapObject,
-        width: 904,
-        height: 1414
-    });
-
-    background.add(mapImage);
-    background.batchDraw();
-};
-
-replayFile.change(function() {
+replayFileA.change(function() {
     let loadedReplay = this.files[0];
     const reader = new FileReader();
     reader.addEventListener('load', (event) => {
         let replayRows = event.target.result.split("\r\n");
-        replay = getReplayData(replayRows);
-        svgData = getSvgData(replay);
+        playerA.replay = null;
+        playerA.replay = getReplayData(replayRows);
+        playerA.replaySvgData = [];
+        generateSvgPathData(playerA.replay, playerA.replaySvgData);
+        rewind();
+    });
+    reader.readAsText(loadedReplay);
+});
+
+replayFileB.change(function() {
+    let loadedReplay = this.files[0];
+    const reader = new FileReader();
+    reader.addEventListener('load', (event) => {
+        let replayRows = event.target.result.split("\r\n");
+        playerB.replay = null;
+        playerB.replay = getReplayData(replayRows);
+        playerB.replaySvgData = [];
+        generateSvgPathData(playerB.replay, playerB.replaySvgData);
+        rewind();
     });
     reader.readAsText(loadedReplay);
 });
 
 playButton.click(() => {
-    if (svgData) {
+    if (playerA.replaySvgData) {
         play();
     }
 });
@@ -415,9 +524,9 @@ speedSelectTripple.click(() => {
     speedButtonText.text("3x");
 });
 
-stage.add(background);
-stage.add(foreground);
+scrollContainer.scroll(() => {
+    repositionStage();
+});
 
-scrollContainer.addEventListener('scroll', repositionStage);
 repositionStage();
 showFirstCastle();

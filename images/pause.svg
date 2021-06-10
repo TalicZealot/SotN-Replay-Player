@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?> <svg xmlns="http://www.w3.org/2000/svg" width="28" height="42" viewBox="0 0 28 42">
+  <defs>
+    <style>
+      .a {
+        fill: #15e0a7;
+      }
+    </style>
+  </defs>
+  <title>13 Pause</title>
+  <g>
+    <rect class="a" width="10" height="42" rx="3" ry="3"/>
+    <rect class="a" x="18" width="10" height="42" rx="3" ry="3"/>
+  </g>
+</svg>

@@ -18,6 +18,8 @@
     --playstation-triangle: #50f850;
     --playstation-grey-light: #b0afb2;
     --playstation-grey-dark: #414143;
+    --player-1: #e79544;
+    --player-2: #27ba5b;
 }
 
 body {
@@ -156,13 +158,31 @@ article div {
     gap: 1em;
 }
 
-#replay-file {
-    cursor: pointer;
-    padding: 0.2em;
-    min-width: 60%;
-    display: flex;
-    justify-content: center;
+.replays-panel {
+    margin-top: 1em;
+    padding: 0.3em;
     color: var(--pastel-green);
+    border-radius: 10px;
+    background-color: var(--grey-medium);
+    display: flex;
+    flex-direction: column;
+}
+
+.replay-file {
+    padding: 0.2em;
+    font-size: 1em;
+    cursor: pointer;
+    display: flex;
+    flex-grow: 0;
+    color: var(--pastel-green);
+}
+
+.player-1 {
+    color: var(--player-1);
+}
+
+.player-2 {
+    color: var(--player-2);
 }
 
 .player-button {
@@ -179,6 +199,21 @@ article div {
 
 .player-button:hover {
     background-color: var(--grey-medium);
+}
+
+.play-icon {
+    background: url(images/play.svg) no-repeat center;
+    background-size: 1em 1em;
+}
+
+.pause-icon {
+    background: url(images/pause.svg) no-repeat center;
+    background-size: 1em 1em;
+}
+
+.rewind-icon {
+    background: url(images/rewind.svg) no-repeat center;
+    background-size: 1em 1em;
 }
 
 .relic {
