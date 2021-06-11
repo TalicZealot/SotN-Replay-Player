@@ -3,21 +3,20 @@ const height = 1414;
 const defaultPlaybackSpeed = 0.04;
 const validExtension = "sotnr";
 
-var scrollContainer = document.getElementById('scroll-container');
-var replayFileA = $('#replay-file-A');
-var replayFileB = $('#replay-file-B');
-var uploadBox = $('#upload-box');
-
-var playButton = $('#play-button');
-var rewindButton = $("#rewind-button");
-var progressBar = $('#progress-bar');
-var speedButton = $('#speed-button');
-var speedButtonText = $('#speed-button-text');
-var speedSelectPanel = $('#speed-select-panel');
-var speedSelectHalf = $('#speed-select-half');
-var speedSelectNormal = $('#speed-select-normal');
-var speedSelectDouble = $('#speed-select-double');
-var speedSelectTripple = $('#speed-select-tripple');
+const scrollContainer = document.getElementById('scroll-container');
+const replayFileA = $('#replay-file-A');
+const replayFileB = $('#replay-file-B');
+const uploadBox = $('#upload-box');
+const playButton = $('#play-button');
+const rewindButton = $("#rewind-button");
+const progressBar = $('#progress-bar');
+const speedButton = $('#speed-button');
+const speedButtonText = $('#speed-button-text');
+const speedSelectPanel = $('#speed-select-panel');
+const speedSelectHalf = $('#speed-select-half');
+const speedSelectNormal = $('#speed-select-normal');
+const speedSelectDouble = $('#speed-select-double');
+const speedSelectTripple = $('#speed-select-tripple');
 
 var stage = new Konva.Stage({
     container: 'main-map',
@@ -30,16 +29,20 @@ var playerA = {
         x: 8,
         y: 1240,
         radius: 5,
-        fill: '#e79544',
-        stroke: 'black',
+        fill: '#fd5123',
+        stroke: 'white',
         strokeWidth: 2
     }),
     trail: new Konva.Path({
         x: 0,
         y: 0,
-        stroke: '#e79544',
+        stroke: '#de542f',
         strokeWidth: 4,
-        opacity: 1
+        opacity: 0.8,
+        shadowColor: 'black',
+        shadowBlur: 0,
+        shadowOffset: { x: 1, y: 1 },
+        shadowOpacity: 0.6
     }),
     replay: null,
     replaySvgData: []
@@ -50,16 +53,16 @@ var playerB = {
         x: 8,
         y: 1240,
         radius: 5,
-        fill: '#27ba5b',
-        stroke: '#111111',
+        fill: '#345fff',
+        stroke: 'white',
         strokeWidth: 2
     }),
     trail: new Konva.Path({
         x: 0,
         y: 0,
-        stroke: '#27ba5b',
+        stroke: '#0b1291',
         strokeWidth: 4,
-        opacity: 1
+        opacity: 0.8
     }),
     replay: null,
     replaySvgData: []
@@ -75,6 +78,25 @@ foreground.add(playerA.indicator);
 stage.add(background);
 stage.add(relicsLayer);
 stage.add(foreground);
+
+var tweents = {
+    warpOutPlayerA: new Konva.Tween({
+        node: playerA.indicator,
+        duration: 0.4,
+        fill: 'white',
+        opacity: 0.3,
+        scaleX: 2,
+    }),
+    warpOutPlayerB: new Konva.Tween({
+        node: playerB.indicator,
+        duration: 0.4,
+        fill: 'white',
+        opacity: 0.3,
+        scaleX: 2
+    }),
+    isWarpingPlayerB: false,
+    isWarpingPlayerA: false
+};
 
 var relics = {
     SoulOfBat: false,
@@ -137,6 +159,7 @@ var playbackSpeed = 1;
 var animationIndex = 0;
 var oldIndex = 0;
 var castle = 1;
+var animationEnded = false;
 
 function getManhattanDistance(pointA, pointB) {
     let xdifference = Math.abs(pointA.x - pointB.x);
@@ -150,9 +173,15 @@ function rewind() {
     oldIndex = 0;
     castle = 1;
     playerA.trail.data(playerA.replaySvgData[0]);
-    animation = null;
     playerA.indicator.x(playerA.replay[0].x);
     playerA.indicator.y(playerA.replay[0].y);
+
+    if (playerB.replay) {
+        playerB.trail.data(playerB.replaySvgData[0]);
+        playerB.indicator.x(playerB.replay[0].x);
+        playerB.indicator.y(playerB.replay[0].y);
+    }
+
     foreground.batchDraw();
 }
 
@@ -161,16 +190,35 @@ function seek() {
         return;
     }
     let progress = progressBar.val();
+    let index;
 
-    let index = Math.round(playerA.replay.length * (progress / 100));
+    if (playerB.replay && playerB.replay.length > playerA.replay.length) {
+        index = Math.round((playerB.replay.length - 1) * (progress / 100));
+    } else {
+        index = Math.round((playerA.replay.length - 1) * (progress / 100));
+    }
 
     animationIndex = index;
     oldIndex = index;
+    let indexA = index;
+    if (indexA > playerA.replay.length - 1) {
+        indexA = playerA.replay.length - 1;
+    }
 
-    playerA.indicator.x(playerA.replay[index].x);
-    playerA.indicator.y(playerA.replay[index].y);
+    playerA.indicator.x(playerA.replay[indexA].x);
+    playerA.indicator.y(playerA.replay[indexA].y);
 
-    playerA.trail.data(playerA.replaySvgData[index]);
+    playerA.trail.data(playerA.replaySvgData[indexA]);
+
+    if (playerB.replay) {
+        if (index > playerB.replay.length - 1) {
+            index = playerB.replay.length - 1;
+        }
+        playerB.indicator.x(playerB.replay[index].x);
+        playerB.indicator.y(playerB.replay[index].y);
+
+        playerB.trail.data(playerB.replaySvgData[index]);
+    }
 
     foreground.batchDraw();
 }
@@ -267,7 +315,7 @@ function getRelicLocations(replayData) {
     relicsLayer.batchDraw();
 }
 
-function generateSvgPathData(replayData, pathData) {
+function generateSvgPathData(replayData, pathData, offset) {
     let startNode = 'M' + replayData[0].x + ',' + replayData[0].y + ' ';
     pathData.push(startNode);
     for (let i = 1; i < replayData.length; i++) {
@@ -279,7 +327,7 @@ function generateSvgPathData(replayData, pathData) {
             node += 'L';
         }
 
-        node += replayData[i].x + ',' + replayData[i].y + ' ';
+        node += (replayData[i].x + offset.x) + ',' + (replayData[i].y + offset.y) + ' ';
         pathData.push(node);
     }
 }
@@ -304,8 +352,30 @@ function startPlayback() {
         }
 
         let animationSpeed = playbackSpeed * defaultPlaybackSpeed;
-        if (playerA.replay[indexA].warp || (playerB.replay && playerB.replay[indexB].warp)) {
-            animationSpeed = defaultPlaybackSpeed / 5;
+
+        if ((indexA < playerA.replay.length - 1 && playerA.replay[indexA + 1].warp) || playerA.replay[indexA].warp) {
+            animationSpeed = defaultPlaybackSpeed / 4;
+
+            if (!tweents.isWarpingPlayerA) {
+                tweents.warpOutPlayerA.play();
+                tweents.isWarpingPlayerA = true;
+            }
+
+        } else if (tweents.isWarpingPlayerA) {
+            tweents.warpOutPlayerA.reverse();
+            tweents.isWarpingPlayerA = false;
+        }
+
+        if ((playerB.replay && indexB < playerB.replay.length - 1 && playerB.replay[indexB + 1].warp) ||
+            (playerB.replay && playerB.replay[indexB].warp)) {
+            animationSpeed = defaultPlaybackSpeed / 4;
+            if (!tweents.isWarpingPlayerB) {
+                tweents.warpOutPlayerB.play();
+                tweents.isWarpingPlayerB = true;
+            }
+        } else if (tweents.isWarpingPlayerB) {
+            tweents.warpOutPlayerB.reverse();
+            tweents.isWarpingPlayerB = false;
         }
 
         animationIndex += animationSpeed;
@@ -345,7 +415,11 @@ function startPlayback() {
         if (index > oldIndex) {
             playerA.trail.data(playerA.replaySvgData[indexA - 1]);
             oldIndex = index;
-            progressBar.val(Math.round((indexA / playerA.replay.length) * 100));
+            if (playerB.replay && playerB.replay.length > playerA.replay.length) {
+                progressBar.val(Math.round((indexB / playerB.replay.length) * 100));
+            } else {
+                progressBar.val(Math.round((indexA / playerA.replay.length) * 100));
+            }
         }
 
         setRelics(indexA);
@@ -354,6 +428,7 @@ function startPlayback() {
         if ((playerB.replay && playerB.replay.length > playerA.replay.length && index == playerB.replay.length - 1) ||
             (playerB.replay && playerA.replay.length > playerB.replay.length && index == playerA.replay.length - 1) ||
             (!playerB.replay && (index == playerA.replay.length - 1))) {
+            animationEnded = true;
             animation.stop();
             playButton.removeClass('pause-icon');
             playButton.addClass('play-icon');
@@ -412,6 +487,10 @@ function play() {
         if (animation.isRunning()) {
             pause();
         } else {
+            if (animationEnded) {
+                animationEnded = false;
+                rewind();
+            }
             animation.start();
             playButton.removeClass('play-icon');
             playButton.addClass('pause-icon');
@@ -455,7 +534,7 @@ replayFileA.change(function() {
         playerA.replay = null;
         playerA.replay = getReplayData(replayRows);
         playerA.replaySvgData = [];
-        generateSvgPathData(playerA.replay, playerA.replaySvgData);
+        generateSvgPathData(playerA.replay, playerA.replaySvgData, { x: 0, y: -2 });
         rewind();
     });
     reader.readAsText(loadedReplay);
@@ -469,7 +548,7 @@ replayFileB.change(function() {
         playerB.replay = null;
         playerB.replay = getReplayData(replayRows);
         playerB.replaySvgData = [];
-        generateSvgPathData(playerB.replay, playerB.replaySvgData);
+        generateSvgPathData(playerB.replay, playerB.replaySvgData, { x: 3, y: 1 });
         rewind();
     });
     reader.readAsText(loadedReplay);
