@@ -169,12 +169,16 @@ function getManhattanDistance(pointA, pointB) {
 
 function rewind() {
     pause();
+    showFirstCastle();
     animationIndex = 0;
     oldIndex = 0;
     castle = 1;
-    playerA.trail.data(playerA.replaySvgData[0]);
-    playerA.indicator.x(playerA.replay[0].x);
-    playerA.indicator.y(playerA.replay[0].y);
+
+    if (playerA.replay) {
+        playerA.trail.data(playerA.replaySvgData[0]);
+        playerA.indicator.x(playerA.replay[0].x);
+        playerA.indicator.y(playerA.replay[0].y);
+    }
 
     if (playerB.replay) {
         playerB.trail.data(playerB.replaySvgData[0]);
@@ -193,9 +197,9 @@ function seek() {
     let index;
 
     if (playerB.replay && playerB.replay.length > playerA.replay.length) {
-        index = Math.round((playerB.replay.length - 1) * (progress / 100));
+        index = Math.round((playerB.replay.length - 1) * (progress / 1000));
     } else {
-        index = Math.round((playerA.replay.length - 1) * (progress / 100));
+        index = Math.round((playerA.replay.length - 1) * (progress / 1000));
     }
 
     animationIndex = index;
@@ -333,17 +337,24 @@ function generateSvgPathData(replayData, pathData, offset) {
 }
 
 function startPlayback() {
-    playerA.trail.data(playerA.replaySvgData[0]);
 
-    playerA.indicator.x(playerA.replay[0].x);
-    playerA.indicator.y(playerA.replay[0].y);
+    if (playerA.replay) {
+        playerA.trail.data(playerA.replaySvgData[0]);
+        playerA.indicator.x(playerA.replay[0].x);
+        playerA.indicator.y(playerA.replay[0].y);
+    }
+    if (playerB.replay) {
+        playerB.trail.data(playerB.replaySvgData[0]);
+        playerB.indicator.x(playerB.replay[0].x);
+        playerB.indicator.y(playerB.replay[0].y);
+    }
 
     animation = new Konva.Animation(function(frame) {
         let index = Math.round(animationIndex);
         let indexA = index;
         let indexB = index;
 
-        if (index >= playerA.replay.length) {
+        if (playerA.replay && index >= playerA.replay.length) {
             indexA = playerA.replay.length - 1;
         }
 
@@ -353,7 +364,8 @@ function startPlayback() {
 
         let animationSpeed = playbackSpeed * defaultPlaybackSpeed;
 
-        if ((indexA < playerA.replay.length - 1 && playerA.replay[indexA + 1].warp) || playerA.replay[indexA].warp) {
+        if ((playerA.replay && indexA < playerA.replay.length - 1 && playerA.replay[indexA + 1].warp) ||
+            (playerA.replay && playerA.replay[indexA].warp)) {
             animationSpeed = defaultPlaybackSpeed / 4;
 
             if (!tweents.isWarpingPlayerA) {
@@ -383,7 +395,7 @@ function startPlayback() {
         indexA = index;
         indexB = index;
 
-        if (index >= playerA.replay.length) {
+        if (playerA.replay && index >= playerA.replay.length) {
             indexA = playerA.replay.length - 1;
         }
 
@@ -391,19 +403,31 @@ function startPlayback() {
             indexB = playerB.replay.length - 1;
         }
 
-        if (playerA.replay[indexA].secondCastle) {
+        if (playerA.replay && playerA.replay[indexA].secondCastle) {
             if (castle == 1) {
                 castle = 2;
                 showSecondtCastle();
             }
-        } else {
+        } else if (playerA.replay && !playerA.replay[indexA].secondCastle) {
+            if (castle == 2) {
+                castle = 1;
+                showFirstCastle();
+            }
+        } else if (playerB.replay && playerB.replay[indexB].secondCastle) {
+            if (castle == 1) {
+                castle = 2;
+                showSecondtCastle();
+            }
+        } else if (playerB.replay && !playerB.replay[indexB].secondCastle) {
             if (castle == 2) {
                 castle = 1;
                 showFirstCastle();
             }
         }
 
-        approach(playerA.indicator, playerA.replay[indexA]);
+        if (playerA.replay) {
+            approach(playerA.indicator, playerA.replay[indexA]);
+        }
 
         if (playerB.replay) {
             approach(playerB.indicator, playerB.replay[indexB]);
@@ -415,19 +439,24 @@ function startPlayback() {
         if (index > oldIndex) {
             playerA.trail.data(playerA.replaySvgData[indexA - 1]);
             oldIndex = index;
-            if (playerB.replay && playerB.replay.length > playerA.replay.length) {
-                progressBar.val(Math.round((indexB / playerB.replay.length) * 100));
+            if (playerB.replay && playerA.replay && playerB.replay.length > playerA.replay.length) {
+                progressBar.val(Math.round((indexB / playerB.replay.length) * 1000));
+            } else if (playerA.replay) {
+                progressBar.val(Math.round((indexA / playerA.replay.length) * 1000));
             } else {
-                progressBar.val(Math.round((indexA / playerA.replay.length) * 100));
+                progressBar.val(Math.round((indexB / playerB.replay.length) * 1000));
             }
+            if (playerA.replay) {
+                setRelics(indexA, playerA.replay);
+            } else {
+                setRelics(indexB, playerB.replay);
+            }
+            displayRelics();
         }
 
-        setRelics(indexA);
-        displayRelics();
-
-        if ((playerB.replay && playerB.replay.length > playerA.replay.length && index == playerB.replay.length - 1) ||
-            (playerB.replay && playerA.replay.length > playerB.replay.length && index == playerA.replay.length - 1) ||
-            (!playerB.replay && (index == playerA.replay.length - 1))) {
+        if ((playerB.replay && playerA.replay && playerB.replay.length > playerA.replay.length && index == playerB.replay.length - 1) ||
+            (playerB.replay && playerA.replay && playerA.replay.length > playerB.replay.length && index == playerA.replay.length - 1) ||
+            (!playerB.replay && (index == playerA.replay.length - 1)) || (!playerA.replay && (index == playerB.replay.length - 1))) {
             animationEnded = true;
             animation.stop();
             playButton.removeClass('pause-icon');
@@ -455,10 +484,10 @@ function approach(object, point) {
     }
 }
 
-function setRelics(index) {
+function setRelics(index, source) {
     let relicKeys = Object.getOwnPropertyNames(relics);
     for (let i = 0; i < relicKeys.length; i++) {
-        relics[relicKeys[i]] = playerA.replay[index].relics[relicKeys[i]] > 0;
+        relics[relicKeys[i]] = source[index].relics[relicKeys[i]] > 0;
     }
 }
 
@@ -555,7 +584,7 @@ replayFileB.change(function() {
 });
 
 playButton.click(() => {
-    if (playerA.replaySvgData) {
+    if (playerA.replay || playerB.replay) {
         play();
     }
 });
