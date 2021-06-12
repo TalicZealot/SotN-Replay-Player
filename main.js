@@ -1,12 +1,16 @@
 const width = 904;
 const height = 1414;
-const defaultPlaybackSpeed = 0.04;
+const defaultPlaybackSpeed = 0.15;
 const validExtension = "sotnr";
 
 const scrollContainer = document.getElementById('scroll-container');
-const replayFileA = $('#replay-file-A');
-const replayFileB = $('#replay-file-B');
-const uploadBox = $('#upload-box');
+const replayFiles = $('#replay-files');
+const replayAtitle = $('#replay-A-title');
+const replayBtitle = $('#replay-B-title');
+const selectPlayer1 = $('#select-player-1');
+const selectPlayer2 = $('#select-player-2');
+const player1panel = $('#player-1-panel');
+const player2panel = $('#player-2-panel');
 const playButton = $('#play-button');
 const rewindButton = $("#rewind-button");
 const progressBar = $('#progress-bar');
@@ -45,7 +49,45 @@ var playerA = {
         shadowOpacity: 0.6
     }),
     replay: null,
-    replaySvgData: []
+    onTop: true,
+    replaySvgData: [],
+    relics: {
+        SoulOfBat: false,
+        FireOfBat: false,
+        EchoOfBat: false,
+        ForceOfEcho: false,
+        SoulOfWolf: false,
+        PowerOfWolf: false,
+        SkillOfWolf: false,
+        FormOfMist: false,
+        PowerOfMist: false,
+        GasCloud: false,
+        CubeOfZoe: false,
+        SpiritOrb: false,
+        GravityBoots: false,
+        LeapStone: false,
+        HolySymbol: false,
+        FaerieScroll: false,
+        JewelOfOpen: false,
+        MermanStatue: false,
+        BatCard: false,
+        GhostCard: false,
+        FaerieCard: false,
+        DemonCard: false,
+        SwordCard: false,
+        SpriteCard: false,
+        NoseDevilCard: false,
+        HeartOfVlad: false,
+        ToothOfVlad: false,
+        RibOfVlad: false,
+        RingOfVlad: false,
+        EyeOfVlad: false,
+        GoldRing: false,
+        SilverRing: false,
+        SpikeBreaker: false,
+        HolyGlasses: false,
+        ThrustSword: false
+    }
 };
 
 var playerB = {
@@ -65,7 +107,45 @@ var playerB = {
         opacity: 0.8
     }),
     replay: null,
-    replaySvgData: []
+    onTop: false,
+    replaySvgData: [],
+    relics: {
+        SoulOfBat: false,
+        FireOfBat: false,
+        EchoOfBat: false,
+        ForceOfEcho: false,
+        SoulOfWolf: false,
+        PowerOfWolf: false,
+        SkillOfWolf: false,
+        FormOfMist: false,
+        PowerOfMist: false,
+        GasCloud: false,
+        CubeOfZoe: false,
+        SpiritOrb: false,
+        GravityBoots: false,
+        LeapStone: false,
+        HolySymbol: false,
+        FaerieScroll: false,
+        JewelOfOpen: false,
+        MermanStatue: false,
+        BatCard: false,
+        GhostCard: false,
+        FaerieCard: false,
+        DemonCard: false,
+        SwordCard: false,
+        SpriteCard: false,
+        NoseDevilCard: false,
+        HeartOfVlad: false,
+        ToothOfVlad: false,
+        RibOfVlad: false,
+        RingOfVlad: false,
+        EyeOfVlad: false,
+        GoldRing: false,
+        SilverRing: false,
+        SpikeBreaker: false,
+        HolyGlasses: false,
+        ThrustSword: false
+    }
 };
 
 var background = new Konva.Layer();
@@ -76,8 +156,8 @@ foreground.add(playerA.trail);
 foreground.add(playerB.indicator);
 foreground.add(playerA.indicator);
 stage.add(background);
-stage.add(relicsLayer);
 stage.add(foreground);
+stage.add(relicsLayer);
 
 var tweents = {
     warpOutPlayerA: new Konva.Tween({
@@ -98,44 +178,6 @@ var tweents = {
     isWarpingPlayerA: false
 };
 
-var relics = {
-    SoulOfBat: false,
-    FireOfBat: false,
-    EchoOfBat: false,
-    ForceOfEcho: false,
-    SoulOfWolf: false,
-    PowerOfWolf: false,
-    SkillOfWolf: false,
-    FormOfMist: false,
-    PowerOfMist: false,
-    GasCloud: false,
-    CubeOfZoe: false,
-    SpiritOrb: false,
-    GravityBoots: false,
-    LeapStone: false,
-    HolySymbol: false,
-    FaerieScroll: false,
-    JewelOfOpen: false,
-    MermanStatue: false,
-    BatCard: false,
-    GhostCard: false,
-    FaerieCard: false,
-    DemonCard: false,
-    SwordCard: false,
-    SpriteCard: false,
-    NoseDevilCard: false,
-    HeartOfVlad: false,
-    ToothOfVlad: false,
-    RibOfVlad: false,
-    RingOfVlad: false,
-    EyeOfVlad: false,
-    GoldRing: false,
-    SilverRing: false,
-    SpikeBreaker: false,
-    HolyGlasses: false
-        //ThrustSword: false,
-};
-
 var mapElement = new Image();
 mapElement.src = './images/map.png';
 mapElement.onload = function() {
@@ -151,7 +193,10 @@ mapElement.onload = function() {
     background.batchDraw();
 };
 
-mapRelics = new Array(relics.length);
+mapRelics = new Array(36);
+for (let i = 0; i < mapRelics.length; i++) {
+    mapRelics[i] = { x: -20, y: -20 };
+}
 
 var speedsPanelShown = false;
 var animation;
@@ -160,6 +205,12 @@ var animationIndex = 0;
 var oldIndex = 0;
 var castle = 1;
 var animationEnded = false;
+var mapRelicsLoaded = false;
+
+var bitFlags = [];
+for (let i = 0; i < 30; i++) {
+    bitFlags.push(Math.pow(2, i));
+}
 
 function getManhattanDistance(pointA, pointB) {
     let xdifference = Math.abs(pointA.x - pointB.x);
@@ -234,15 +285,11 @@ function getReplayData(replayRows) {
         let thrust = 0;
         let warp = false;
 
-        if (!values[0] || values[0] > 100 || !values[1] || values[1] > 100) {
-            return;
-        }
-
         if (values[37]) {
             thrust = values[37];
         }
 
-        let secondCastle = values[2] > 0;
+        let secondCastle = values[3] > 0;
         let x = (((values[0] - 1) * 15) - 7);
         let y;
         if (secondCastle) {
@@ -255,68 +302,72 @@ function getReplayData(replayRows) {
             warp = true;
         }
 
-        pathCoords.push({
+        let frame = {
             x: x,
             y: y,
+            time: values[2],
             warp: warp,
             secondCastle: secondCastle,
             relics: {
-                SoulOfBat: values[3],
-                FireOfBat: values[4],
-                EchoOfBat: values[5],
-                ForceOfEcho: values[6],
-                SoulOfWolf: values[7],
-                PowerOfWolf: values[8],
-                SkillOfWolf: values[9],
-                FormOfMist: values[10],
-                PowerOfMist: values[11],
-                GasCloud: values[12],
-                CubeOfZoe: values[13],
-                SpiritOrb: values[14],
-                GravityBoots: values[15],
-                LeapStone: values[16],
-                HolySymbol: values[17],
-                FaerieScroll: values[18],
-                JewelOfOpen: values[19],
-                MermanStatue: values[20],
-                BatCard: values[21],
-                GhostCard: values[22],
-                FaerieCard: values[23],
-                DemonCard: values[24],
-                SwordCard: values[25],
-                SpriteCard: values[26],
-                NoseDevilCard: values[27],
-                HeartOfVlad: values[28],
-                ToothOfVlad: values[29],
-                RibOfVlad: values[30],
-                RingOfVlad: values[31],
-                EyeOfVlad: values[32],
-                GoldRing: values[33],
-                SilverRing: values[34],
-                SpikeBreaker: values[35],
-                HolyGlasses: values[36],
-                ThrustSword: thrust
+                SoulOfBat: values[4] & bitFlags[0],
+                FireOfBat: values[4] & bitFlags[1],
+                EchoOfBat: values[4] & bitFlags[2],
+                ForceOfEcho: values[4] & bitFlags[3],
+                SoulOfWolf: values[4] & bitFlags[4],
+                PowerOfWolf: values[4] & bitFlags[5],
+                SkillOfWolf: values[4] & bitFlags[6],
+                FormOfMist: values[4] & bitFlags[7],
+                PowerOfMist: values[4] & bitFlags[8],
+                GasCloud: values[4] & bitFlags[9],
+                CubeOfZoe: values[4] & bitFlags[10],
+                SpiritOrb: values[4] & bitFlags[11],
+                GravityBoots: values[4] & bitFlags[12],
+                LeapStone: values[4] & bitFlags[13],
+                HolySymbol: values[4] & bitFlags[14],
+                FaerieScroll: values[4] & bitFlags[15],
+                JewelOfOpen: values[4] & bitFlags[16],
+                MermanStatue: values[4] & bitFlags[17],
+                BatCard: values[4] & bitFlags[18],
+                GhostCard: values[4] & bitFlags[19],
+                FaerieCard: values[4] & bitFlags[20],
+                DemonCard: values[4] & bitFlags[21],
+                SwordCard: values[4] & bitFlags[22],
+                SpriteCard: values[4] & bitFlags[23],
+                NoseDevilCard: values[4] & bitFlags[24],
+                HeartOfVlad: values[4] & bitFlags[25],
+                ToothOfVlad: values[4] & bitFlags[26],
+                RibOfVlad: values[4] & bitFlags[27],
+                RingOfVlad: values[4] & bitFlags[28],
+                EyeOfVlad: values[4] & bitFlags[29],
+                GoldRing: values[5] & bitFlags[0],
+                SilverRing: values[5] & bitFlags[1],
+                SpikeBreaker: values[5] & bitFlags[2],
+                HolyGlasses: values[5] & bitFlags[3],
+                ThrustSword: values[5] & bitFlags[4]
             }
-        });
+        };
+        pathCoords.push(frame);
+        for (let i = 0; i < frame.time; i++) {
+            pathCoords.push(frame);
+        }
     });
     return pathCoords;
 }
 
 function getRelicLocations(replayData) {
-    let relicKeys = Object.getOwnPropertyNames(relics);
+    let relicKeys = Object.getOwnPropertyNames(playerA.relics);
     for (let i = 1; i < replayData.length; i++) {
         for (let j = 0; j < relicKeys.length; j++) {
             if (replayData[i].relics[relicKeys[j]] > 0 && replayData[i - 1].relics[relicKeys[j]] == 0) {
-                relicKeys.splice(j, 1);
                 if (!mapRelics[j]) {
                     continue;
                 }
-                mapRelics[j].x(replayData[i].x);
-                mapRelics[j].y(replayData[i].y - 8);
+                mapRelics[j].x = replayData[i].x - 8;
+                mapRelics[j].y = replayData[i].y - 8;
             }
         }
     }
-    relicsLayer.batchDraw();
+    initializeMapRelics();
 }
 
 function generateSvgPathData(replayData, pathData, offset) {
@@ -447,11 +498,13 @@ function startPlayback() {
                 progressBar.val(Math.round((indexB / playerB.replay.length) * 1000));
             }
             if (playerA.replay) {
-                setRelics(indexA, playerA.replay);
-            } else {
-                setRelics(indexB, playerB.replay);
+                setRelics(indexA, playerA.replay, playerA.relics);
+                displayRelics(playerA.relics, 1);
             }
-            displayRelics();
+            if (playerB.replay) {
+                setRelics(indexB, playerB.replay, playerB.relics);
+                displayRelics(playerB.relics, 2);
+            }
         }
 
         if ((playerB.replay && playerA.replay && playerB.replay.length > playerA.replay.length && index == playerB.replay.length - 1) ||
@@ -471,30 +524,35 @@ function approach(object, point) {
     let currentXpos = object.x();
     let currentYpos = object.y();
 
-    if (currentXpos < point.x) {
-        object.x(currentXpos + ((0.3 * playbackSpeed) + ((0.04 * playbackSpeed) * (point.x - currentXpos))));
+    if (Math.abs(currentXpos - point.x) < 0.2) {
+        object.x(point.x);
+    } else if (currentXpos < point.x) {
+        object.x(currentXpos + ((0.4 * playbackSpeed) + ((0.05 * playbackSpeed) * (point.x - currentXpos))));
     } else if (currentXpos > point.x) {
-        object.x(currentXpos - ((0.3 * playbackSpeed) + ((0.04 * playbackSpeed) * (currentXpos - point.x))));
+        object.x(currentXpos - ((0.4 * playbackSpeed) + ((0.05 * playbackSpeed) * (currentXpos - point.x))));
     }
 
-    if (currentYpos < point.y) {
-        object.y(currentYpos + ((0.3 * playbackSpeed) + ((0.04 * playbackSpeed) * (point.y - currentYpos))));
+    if (Math.abs(currentYpos - point.y) < 0.2) {
+        object.y(point.y);
+    } else if (currentYpos < point.y) {
+        object.y(currentYpos + ((0.4 * playbackSpeed) + ((0.05 * playbackSpeed) * (point.y - currentYpos))));
     } else if (currentYpos > point.y) {
-        object.y(currentYpos - ((0.3 * playbackSpeed) + ((0.04 * playbackSpeed) * (currentYpos - point.y))));
+        object.y(currentYpos - ((0.4 * playbackSpeed) + ((0.05 * playbackSpeed) * (currentYpos - point.y))));
     }
 }
 
-function setRelics(index, source) {
-    let relicKeys = Object.getOwnPropertyNames(relics);
+function setRelics(index, source, destination) {
+    let relicKeys = Object.getOwnPropertyNames(destination);
     for (let i = 0; i < relicKeys.length; i++) {
-        relics[relicKeys[i]] = source[index].relics[relicKeys[i]] > 0;
+        destination[relicKeys[i]] = source[index].relics[relicKeys[i]] > 0;
     }
 }
 
-function displayRelics() {
+function displayRelics(relics, player) {
+    let affix = player > 1 ? "2" : "";
     let relicKeys = Object.getOwnPropertyNames(relics);
     for (let i = 0; i < relicKeys.length; i++) {
-        let currentRelic = $('#' + relicKeys[i]);
+        let currentRelic = $('#' + relicKeys[i] + affix);
         if (relics[relicKeys[i]] && currentRelic.hasClass('uncollected')) {
             currentRelic.removeClass('uncollected');
         } else if (!relics[relicKeys[i]] && !currentRelic.hasClass('uncollected')) {
@@ -555,32 +613,71 @@ function showSecondtCastle() {
     });
 }
 
-replayFileA.change(function() {
+selectPlayer1.click(() => {
+    if (player1panel.hasClass('hidden')) {
+        player1panel.removeClass('hidden');
+        player2panel.addClass('hidden');
+        selectPlayer1.removeClass('select-player-button-inactive');
+        selectPlayer1.addClass('select-player-button-active');
+        selectPlayer2.removeClass('select-player-button-active');
+        selectPlayer2.addClass('select-player-button-inactive');
+
+        if (!playerA.onTop) {
+            playerA.onTop = true;
+            playerB.onTop = false;
+            playerA.indicator.moveUp();
+            playerA.trail.moveUp();
+        }
+    }
+});
+
+selectPlayer2.click(() => {
+    if (player2panel.hasClass('hidden')) {
+        player2panel.removeClass('hidden');
+        player1panel.addClass('hidden');
+        selectPlayer2.removeClass('select-player-button-inactive');
+        selectPlayer2.addClass('select-player-button-active');
+        selectPlayer1.removeClass('select-player-button-active');
+        selectPlayer1.addClass('select-player-button-inactive');
+
+        if (!playerB.onTop) {
+            playerB.onTop = true;
+            playerA.onTop = false;
+            playerB.indicator.moveUp();
+            playerB.trail.moveUp();
+        }
+    }
+});
+
+replayFiles.change(function() {
     let loadedReplay = this.files[0];
     const reader = new FileReader();
     reader.addEventListener('load', (event) => {
         let replayRows = event.target.result.split("\r\n");
         playerA.replay = null;
         playerA.replay = getReplayData(replayRows);
+        getRelicLocations(playerA.replay);
         playerA.replaySvgData = [];
         generateSvgPathData(playerA.replay, playerA.replaySvgData, { x: 0, y: -2 });
         rewind();
     });
     reader.readAsText(loadedReplay);
-});
+    replayAtitle.text(loadedReplay.name.split('.')[0]);
 
-replayFileB.change(function() {
-    let loadedReplay = this.files[0];
-    const reader = new FileReader();
-    reader.addEventListener('load', (event) => {
-        let replayRows = event.target.result.split("\r\n");
-        playerB.replay = null;
-        playerB.replay = getReplayData(replayRows);
-        playerB.replaySvgData = [];
-        generateSvgPathData(playerB.replay, playerB.replaySvgData, { x: 3, y: 1 });
-        rewind();
-    });
-    reader.readAsText(loadedReplay);
+    if (this.files[1]) {
+        let loadedReplay = this.files[1];
+        const reader2 = new FileReader();
+        reader2.addEventListener('load', (event) => {
+            let replayRows = event.target.result.split("\r\n");
+            playerB.replay = null;
+            playerB.replay = getReplayData(replayRows);
+            playerB.replaySvgData = [];
+            generateSvgPathData(playerB.replay, playerB.replaySvgData, { x: 3, y: 1 });
+            rewind();
+        });
+        reader2.readAsText(loadedReplay);
+        replayBtitle.text(loadedReplay.name.split('.')[0]);
+    }
 });
 
 playButton.click(() => {

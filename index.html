@@ -46,72 +46,128 @@
                     <div class="player-button rewind-icon" id="rewind-button"></div>
                 </div>
             </div>
-            <div>
-                <div id="relic-tracker">
-                    <div>
-                        <img class="relic uncollected" src="./images/SoulOfBat.png" alt="SoulOfBat" id="SoulOfBat">
-                        <img class="relic uncollected" src="./images/FireOfBat.png" alt="FireOfBat" id="FireOfBat">
-                        <img class="relic uncollected" src="./images/EchoOfBat.png" alt="EchoOfBat" id="EchoOfBat">
-                        <img class="relic uncollected" src="./images/ForceOfEcho.png" alt="ForceOfEcho" id="ForceOfEcho">
-                        <img class="relic uncollected" src="./images/SoulOfWolf.png" alt="SoulOfWolf" id="SoulOfWolf">
-                        <img class="relic uncollected" src="./images/PowerOfWolf.png" alt="PowerOfWolf" id="PowerOfWolf">
+            <div id="players-panel">
+                <div id="select-player-menu">
+                    <div class="player-1 select-player-button select-player-button-active" id="select-player-1">Player 1</div>
+                    <div class="player-2 select-player-button select-player-button-inactive" id="select-player-2">Player 2</div>
+                </div>
+                <div class="player-panel" id="player-1-panel">
+                    <div class="relic-tracker">
+                        <div>
+                            <img class="relic uncollected" src="./images/SoulOfBat.png" alt="SoulOfBat" id="SoulOfBat">
+                            <img class="relic uncollected" src="./images/FireOfBat.png" alt="FireOfBat" id="FireOfBat">
+                            <img class="relic uncollected" src="./images/EchoOfBat.png" alt="EchoOfBat" id="EchoOfBat">
+                            <img class="relic uncollected" src="./images/ForceOfEcho.png" alt="ForceOfEcho" id="ForceOfEcho">
+                            <img class="relic uncollected" src="./images/SoulOfWolf.png" alt="SoulOfWolf" id="SoulOfWolf">
+                            <img class="relic uncollected" src="./images/PowerOfWolf.png" alt="PowerOfWolf" id="PowerOfWolf">
+                        </div>
+                        <div>
+                            <img class="relic uncollected" src="./images/SkillOfWolf.png" alt="SkillOfWolf" id="SkillOfWolf">
+                            <img class="relic uncollected" src="./images/FormOfMist.png" alt="FormOfMist" id="FormOfMist">
+                            <img class="relic uncollected" src="./images/PowerOfMist.png" alt="PowerOfMist" id="PowerOfMist">
+                            <img class="relic uncollected" src="./images/GasCloud.png" alt="GasCloud" id="GasCloud">
+                            <img class="relic uncollected" src="./images/CubeOfZoe.png" alt="CubeOfZoe" id="CubeOfZoe">
+                            <img class="relic uncollected" src="./images/SpiritOrb.png" alt="SpiritOrb" id="SpiritOrb">
+                        </div>
+                        <div>
+                            <img class="relic uncollected" src="./images/GravityBoots.png" alt="GravityBoots" id="GravityBoots">
+                            <img class="relic uncollected" src="./images/LeapStone.png" alt="LeapStone" id="LeapStone">
+                            <img class="relic uncollected" src="./images/HolySymbol.png" alt="HolySymbol" id="HolySymbol">
+                            <img class="relic uncollected" src="./images/FaerieScroll.png" alt="FaerieScroll" id="FaerieScroll">
+                            <img class="relic uncollected" src="./images/JewelOfOpen.png" alt="JewelOfOpen" id="JewelOfOpen">
+                            <img class="relic uncollected" src="./images/MermanStatue.png" alt="MermanStatue" id="MermanStatue">
+                        </div>
+                        <div>
+                            <img class="relic uncollected" src="./images/BatCard.png" alt="BatCard" id="BatCard">
+                            <img class="relic uncollected" src="./images/GhostCard.png" alt="GhostCard" id="GhostCard">
+                            <img class="relic uncollected" src="./images/FaerieCard.png" alt="FaerieCard" id="FaerieCard">
+                            <img class="relic uncollected" src="./images/DemonCard.png" alt="DemonCard" id="DemonCard">
+                            <img class="relic uncollected" src="./images/SwordCard.png" alt="SwordCard" id="SwordCard">
+                            <img class="relic uncollected" src="./images/SpriteCard.png" alt="SpriteCard" id="SpriteCard">
+                        </div>
+                        <div>
+                            <img class="relic uncollected" src="./images/NoseDevilCard.png" alt="NoseDevilCard" id="NoseDevilCard">
+                            <img class="relic uncollected" src="./images/Claymore.png" alt="ThrustSword" id="ThrustSword">
+                        </div>
+                        <div>
+                            <img class="relic uncollected" src="./images/HeartOfVlad.png" alt="HeartOfVlad" id="HeartOfVlad">
+                            <img class="relic uncollected" src="./images/ToothOfVlad.png" alt="ToothOfVlad" id="ToothOfVlad">
+                            <img class="relic uncollected" src="./images/RibOfVlad.png" alt="RibOfVlad" id="RibOfVlad">
+                            <img class="relic uncollected" src="./images/RingOfVlad.png" alt="RingOfVlad" id="RingOfVlad">
+                            <img class="relic uncollected" src="./images/EyeOfVlad.png" alt="EyeOfVlad" id="EyeOfVlad">
+                        </div>
+                        <div>
+                            <img class="relic uncollected" src="./images/GoldRing.png" alt="GoldRing" id="GoldRing">
+                            <img class="relic uncollected" src="./images/SilverRing.png" alt="SilverRing" id="SilverRing">
+                            <img class="relic uncollected" src="./images/SpikeBreaker.png" alt="SpikeBreaker" id="SpikeBreaker">
+                            <img class="relic uncollected" src="./images/HolyGlasses.png" alt="HolyGlasses" id="HolyGlasses">
+                        </div>
                     </div>
-                    <div>
-                        <img class="relic uncollected" src="./images/SkillOfWolf.png" alt="SkillOfWolf" id="SkillOfWolf">
-                        <img class="relic uncollected" src="./images/FormOfMist.png" alt="FormOfMist" id="FormOfMist">
-                        <img class="relic uncollected" src="./images/PowerOfMist.png" alt="PowerOfMist" id="PowerOfMist">
-                        <img class="relic uncollected" src="./images/GasCloud.png" alt="GasCloud" id="GasCloud">
-                        <img class="relic uncollected" src="./images/CubeOfZoe.png" alt="CubeOfZoe" id="CubeOfZoe">
-                        <img class="relic uncollected" src="./images/SpiritOrb.png" alt="SpiritOrb" id="SpiritOrb">
-                    </div>
-                    <div>
-                        <img class="relic uncollected" src="./images/GravityBoots.png" alt="GravityBoots" id="GravityBoots">
-                        <img class="relic uncollected" src="./images/LeapStone.png" alt="LeapStone" id="LeapStone">
-                        <img class="relic uncollected" src="./images/HolySymbol.png" alt="HolySymbol" id="HolySymbol">
-                        <img class="relic uncollected" src="./images/FaerieScroll.png" alt="FaerieScroll" id="FaerieScroll">
-                        <img class="relic uncollected" src="./images/JewelOfOpen.png" alt="JewelOfOpen" id="JewelOfOpen">
-                        <img class="relic uncollected" src="./images/MermanStatue.png" alt="MermanStatue" id="MermanStatue">
-                    </div>
-                    <div>
-                        <img class="relic uncollected" src="./images/BatCard.png" alt="BatCard" id="BatCard">
-                        <img class="relic uncollected" src="./images/GhostCard.png" alt="GhostCard" id="GhostCard">
-                        <img class="relic uncollected" src="./images/FaerieCard.png" alt="FaerieCard" id="FaerieCard">
-                        <img class="relic uncollected" src="./images/DemonCard.png" alt="DemonCard" id="DemonCard">
-                        <img class="relic uncollected" src="./images/SwordCard.png" alt="SwordCard" id="SwordCard">
-                        <img class="relic uncollected" src="./images/SpriteCard.png" alt="SpriteCard" id="SpriteCard">
-                    </div>
-                    <div>
-                        <img class="relic uncollected" src="./images/NoseDevilCard.png" alt="NoseDevilCard" id="NoseDevilCard">
-                        <img class="relic uncollected" src="./images/Claymore.png" alt="ThrustSword" id="ThrustSword">
-                    </div>
-                    <div>
-                        <img class="relic uncollected" src="./images/HeartOfVlad.png" alt="HeartOfVlad" id="HeartOfVlad">
-                        <img class="relic uncollected" src="./images/ToothOfVlad.png" alt="ToothOfVlad" id="ToothOfVlad">
-                        <img class="relic uncollected" src="./images/RibOfVlad.png" alt="RibOfVlad" id="RibOfVlad">
-                        <img class="relic uncollected" src="./images/RingOfVlad.png" alt="RingOfVlad" id="RingOfVlad">
-                        <img class="relic uncollected" src="./images/EyeOfVlad.png" alt="EyeOfVlad" id="EyeOfVlad">
-                    </div>
-                    <div>
-                        <img class="relic uncollected" src="./images/GoldRing.png" alt="GoldRing" id="GoldRing">
-                        <img class="relic uncollected" src="./images/SilverRing.png" alt="SilverRing" id="SilverRing">
-                        <img class="relic uncollected" src="./images/SpikeBreaker.png" alt="SpikeBreaker" id="SpikeBreaker">
-                        <img class="relic uncollected" src="./images/HolyGlasses.png" alt="HolyGlasses" id="HolyGlasses">
+                </div>
+                <div class="player-panel hidden" id="player-2-panel">
+                    <div class="relic-tracker">
+                        <div>
+                            <img class="relic uncollected" src="./images/SoulOfBat.png" alt="SoulOfBat" id="SoulOfBat2">
+                            <img class="relic uncollected" src="./images/FireOfBat.png" alt="FireOfBat" id="FireOfBat2">
+                            <img class="relic uncollected" src="./images/EchoOfBat.png" alt="EchoOfBat" id="EchoOfBat2">
+                            <img class="relic uncollected" src="./images/ForceOfEcho.png" alt="ForceOfEcho" id="ForceOfEcho2">
+                            <img class="relic uncollected" src="./images/SoulOfWolf.png" alt="SoulOfWolf" id="SoulOfWolf2">
+                            <img class="relic uncollected" src="./images/PowerOfWolf.png" alt="PowerOfWolf" id="PowerOfWolf2">
+                        </div>
+                        <div>
+                            <img class="relic uncollected" src="./images/SkillOfWolf.png" alt="SkillOfWolf" id="SkillOfWolf2">
+                            <img class="relic uncollected" src="./images/FormOfMist.png" alt="FormOfMist" id="FormOfMist2">
+                            <img class="relic uncollected" src="./images/PowerOfMist.png" alt="PowerOfMist" id="PowerOfMist2">
+                            <img class="relic uncollected" src="./images/GasCloud.png" alt="GasCloud" id="GasCloud2">
+                            <img class="relic uncollected" src="./images/CubeOfZoe.png" alt="CubeOfZoe" id="CubeOfZoe2">
+                            <img class="relic uncollected" src="./images/SpiritOrb.png" alt="SpiritOrb" id="SpiritOrb2">
+                        </div>
+                        <div>
+                            <img class="relic uncollected" src="./images/GravityBoots.png" alt="GravityBoots" id="GravityBoots2">
+                            <img class="relic uncollected" src="./images/LeapStone.png" alt="LeapStone" id="LeapStone2">
+                            <img class="relic uncollected" src="./images/HolySymbol.png" alt="HolySymbol" id="HolySymbol2">
+                            <img class="relic uncollected" src="./images/FaerieScroll.png" alt="FaerieScroll" id="FaerieScroll2">
+                            <img class="relic uncollected" src="./images/JewelOfOpen.png" alt="JewelOfOpen" id="JewelOfOpen2">
+                            <img class="relic uncollected" src="./images/MermanStatue.png" alt="MermanStatue" id="MermanStatue2">
+                        </div>
+                        <div>
+                            <img class="relic uncollected" src="./images/BatCard.png" alt="BatCard" id="BatCard2">
+                            <img class="relic uncollected" src="./images/GhostCard.png" alt="GhostCard" id="GhostCard2">
+                            <img class="relic uncollected" src="./images/FaerieCard.png" alt="FaerieCard" id="FaerieCard2">
+                            <img class="relic uncollected" src="./images/DemonCard.png" alt="DemonCard" id="DemonCard2">
+                            <img class="relic uncollected" src="./images/SwordCard.png" alt="SwordCard" id="SwordCard2">
+                            <img class="relic uncollected" src="./images/SpriteCard.png" alt="SpriteCard" id="SpriteCard2">
+                        </div>
+                        <div>
+                            <img class="relic uncollected" src="./images/NoseDevilCard.png" alt="NoseDevilCard" id="NoseDevilCard2">
+                            <img class="relic uncollected" src="./images/Claymore.png" alt="ThrustSword" id="ThrustSword2">
+                        </div>
+                        <div>
+                            <img class="relic uncollected" src="./images/HeartOfVlad.png" alt="HeartOfVlad" id="HeartOfVlad2">
+                            <img class="relic uncollected" src="./images/ToothOfVlad.png" alt="ToothOfVlad" id="ToothOfVlad2">
+                            <img class="relic uncollected" src="./images/RibOfVlad.png" alt="RibOfVlad" id="RibOfVlad2">
+                            <img class="relic uncollected" src="./images/RingOfVlad.png" alt="RingOfVlad" id="RingOfVlad2">
+                            <img class="relic uncollected" src="./images/EyeOfVlad.png" alt="EyeOfVlad" id="EyeOfVlad2">
+                        </div>
+                        <div>
+                            <img class="relic uncollected" src="./images/GoldRing.png" alt="GoldRing" id="GoldRing2">
+                            <img class="relic uncollected" src="./images/SilverRing.png" alt="SilverRing" id="SilverRing2">
+                            <img class="relic uncollected" src="./images/SpikeBreaker.png" alt="SpikeBreaker" id="SpikeBreaker2">
+                            <img class="relic uncollected" src="./images/HolyGlasses.png" alt="HolyGlasses" id="HolyGlasses2">
+                        </div>
                     </div>
                 </div>
                 <div class="replays-panel">
-                    <div>
-                        <div><span class="player-1">Player 1</span> replay:</div>
-                        <input class="replay-file" id="replay-file-A" type="file" accept=".sotnr">
-                    </div>
-                    <div>
-                        <div><span class="player-2">Player 2</span> replay:</div>
-                        <input class="replay-file" id="replay-file-B" type="file" accept=".sotnr">
-                    </div>
+                    <label id="upload-button" for="replay-files">Upload Replays</label>
+                    <input id="replay-files" type="file" accept=".sotnr" multiple>
+                    <div class="player-1" id="replay-A-title"></div>
+                    <div class="player-2" id="replay-B-title"></div>
                 </div>
             </div>
         </article>
     </div>
 </body>
+<script src="./mapRelics.js"></script>
 <script src="./main.js"></script>
 
 </html>

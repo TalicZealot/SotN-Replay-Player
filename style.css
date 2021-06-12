@@ -123,6 +123,7 @@ article {
     background-color: var(--grey-dark);
     display: flex;
     text-align: left;
+    flex-wrap: wrap;
 }
 
 article div {
@@ -131,6 +132,77 @@ article div {
 
 .article-title {
     color: var(--pastel-blue);
+}
+
+#players-panel {
+    margin-left: 1em;
+}
+
+.replays-panel {
+    margin-top: 1em;
+    padding: 0.3em;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    background-color: var(--grey-medium);
+}
+
+.replays-panel div {
+    text-align: center;
+}
+
+#replay-files {
+    opacity: 0;
+    font-size: 0.1em;
+}
+
+#upload-button {
+    text-align: center;
+    cursor: pointer;
+    color: var(--pastel-green);
+}
+
+#upload-button:hover {
+    color: var(--pastel-blue);
+}
+
+#select-player-menu {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.select-player-button {
+    border-radius: 10px 10px 0 0;
+    vertical-align: middle;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.select-player-button-active {
+    background-color: var(--grey-medium);
+}
+
+.select-player-button-inactive {
+    background-color: var(--grey-darkest);
+}
+
+.relic-tracker {
+    padding: 0.3em;
+}
+
+.player-panel {
+    background-color: var(--grey-medium);
+    border-radius: 0 0 10px 10px;
+}
+
+.player-1 {
+    color: var(--player-1);
+}
+
+.player-2 {
+    color: var(--player-2);
 }
 
 #large-container {
@@ -143,46 +215,25 @@ article div {
     width: 930px;
     height: 707px;
     overflow: auto;
-    scrollbar-width: none;
+    scrollbar-color: var(--pastel-green) var(--grey-darkest);
+    scrollbar-width: thin;
     -ms-overflow-style: none;
 }
 
 #scroll-container::-webkit-scrollbar {
-    width: 0;
-    height: 0;
+    width: 8px;
+    height: 8px;
+    background-color: var(--grey-darkest);
+}
+
+#scroll-container::-webkit-scrollbar-thumb {
+    background: var(--pastel-green);
 }
 
 #replay-controls {
     padding: 0.4em;
     display: flex;
     gap: 1em;
-}
-
-.replays-panel {
-    margin-top: 1em;
-    padding: 0.3em;
-    color: var(--pastel-green);
-    border-radius: 10px;
-    background-color: var(--grey-medium);
-    display: flex;
-    flex-direction: column;
-}
-
-.replay-file {
-    padding: 0.2em;
-    font-size: 1em;
-    cursor: pointer;
-    display: flex;
-    flex-grow: 0;
-    color: var(--pastel-green);
-}
-
-.player-1 {
-    color: var(--player-1);
-}
-
-.player-2 {
-    color: var(--player-2);
 }
 
 .player-button {
