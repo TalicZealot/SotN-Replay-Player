@@ -346,7 +346,9 @@ function getReplayData(replayRows) {
                 ThrustSword: values[5] & bitFlags[4]
             }
         };
-        pathCoords.push(frame);
+        if (frame.time == 0) {
+            pathCoords.push(frame);
+        }
         for (let i = 0; i < frame.time; i++) {
             pathCoords.push(frame);
         }
