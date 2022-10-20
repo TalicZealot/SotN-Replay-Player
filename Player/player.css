@@ -1,0 +1,254 @@
+:root {
+    --off-white: rgb(241, 237, 237);
+    --dirty-white: rgb(145, 145, 145);
+    --text-green: #51d7c1;
+    --plr-grey: #242629BB;
+    --plr-lgrey: #3c3d42;
+    --plr-dgrey: #141517;
+  }
+
+.player-container {
+    display: flex;
+    padding: 0.6em;
+    flex-wrap: wrap;
+}
+
+.main-player {
+    padding: 0.4rem;
+    background-color: var(--plr-grey);
+}
+
+.players-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    padding: 0.4rem;
+    background-color: var(--plr-grey);
+}
+
+.hidden {
+    display: none;
+}
+
+.large-container {
+    width: 904px;
+    height: 1414px;
+    overflow: hidden;
+    background: url(./images/map.png) no-repeat center;
+}
+
+.scroll-container {
+    width: 930px;
+    height: 707px;
+    overflow: auto;
+    scrollbar-color: grey black;
+    scrollbar-width: thin;
+    -ms-overflow-style: none;
+}
+
+.scroll-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background-color: black;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+    background: var(--pastel-green);
+    background-color: black;
+    background: black;
+}
+
+.replay-controls {
+    width: 930px;
+    padding: 1rem;
+    display: flex;
+    gap: 2rem;
+}
+
+.player-button {
+    cursor: pointer;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    color: var(--pastel-green);
+    font-weight: bold;
+    flex-grow: 1;
+}
+
+.player-button:hover {
+    background-color: var(--plr-lgrey);
+}
+
+.player-button span {
+    color: var(--text-green);
+}
+
+.replay-time {
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    color: var(--text-green);
+    flex-grow: 1;
+    font-weight: bold;
+}
+
+.play-icon {
+    background: url(./images/play.svg) no-repeat center;
+    background-size: 1rem 1rem;
+}
+
+.pause-icon {
+    background: url(./images/pause.svg) no-repeat center;
+    background-size: 1rem 1rem;
+}
+
+.rewind-icon {
+    background: url(./images/rewind.svg) no-repeat center;
+    background-size: 1rem 1rem;
+}
+
+.progress-bar-container {
+    width: 100%;
+}
+
+.progress-bar {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 930px;
+    height: 15px;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.progress-bar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #04AA6D;
+    cursor: pointer;
+}
+
+.progress-bar::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #04AA6D;
+    cursor: pointer;
+}
+
+.speed-button {
+    position: relative;
+}
+
+.speed-select-panel {
+    position: absolute;
+    padding: 0.3em;
+    top: -9.6rem;
+    background-color: var(--plr-dgrey);
+}
+
+.speed-select-button {
+    padding: 0.4rem 2rem 0.4rem 2rem;
+}
+
+.speed-select-button:hover {
+    background-color: var(--plr-lgrey);
+}
+
+.player-selector-panel {
+    padding: 0.4rem;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border: 2px solid var(--plr-lgrey);
+    gap: 0.3rem;
+}
+
+.player-selector-button {
+    padding: 0.4rem;
+}
+
+.player-selector {
+    padding: 0.4rem;
+    background-color: var(--plr-dgrey);
+    cursor: pointer;
+}
+
+.player-selector:hover {
+    background-color: var(--plr-lgrey);
+}
+
+.relic-tracker {
+    padding: 0.2rem;
+    border: 2px solid #04AA6D;
+}
+
+.relic {
+    image-rendering: pixelated;
+    object-fit: fill;
+    height: 2vw;
+    width: 2vw;
+    margin-left: 0.1vw;
+    margin-right: 0.1vw;
+}
+
+.uncollected {
+    filter: grayscale(100%) brightness(70%);
+}
+
+.player-indicator {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--plr-dgrey);
+    display: inline-block;
+    margin-left: 0.2rem;
+    margin-right: 0.2rem;
+}
+
+.selected-focus {
+    border: 3px solid var(--off-white);
+}
+
+.selected-secondary {
+    border: 3px solid var(--dirty-white);
+}
+
+.player-8-indicator {
+    background-color: #FCFC38;
+}
+.player-7-indicator {
+    background-color: #CCE0D0;
+}
+.player-6-indicator {
+    background-color: #703014;
+}
+.player-5-indicator {
+    background-color: #88409C;
+}
+.player-4-indicator {
+    background-color: #F88C14;
+}
+.player-3-indicator {
+    background-color: #2CB494;
+}
+.player-2-indicator {
+    background-color: #0C48CC;
+}
+.player-1-indicator {
+    background-color: #F40404;
+}
+
+.unselectable {
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+ }
